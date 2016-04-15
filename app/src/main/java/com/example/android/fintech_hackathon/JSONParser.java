@@ -1,6 +1,5 @@
-package com.example.android.fintech_hackathon.;
+package com.example.android.fintech_hackathon;
 
-import android.app.Activity;
 import android.util.Log;
 
 import org.apache.http.HttpEntity;
