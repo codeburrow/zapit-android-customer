@@ -1,3 +1,6 @@
 <resources>
     <string name="app_name">fintech-hackathon</string>
+
+    <string name="scan">Press to Scan</string>
+
 </resources>
