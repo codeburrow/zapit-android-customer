@@ -7,6 +7,8 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
+import com.google.zxing.integration.android.IntentIntegrator;
+
 public class ScanActivity extends AppCompatActivity implements View.OnClickListener {
 
     // LOG_TAG
@@ -38,6 +40,12 @@ public class ScanActivity extends AppCompatActivity implements View.OnClickListe
         if( v.getId() == R.id.scan_button ){
             Log.e(TAG , "Scan button is pressed");
 
+            // Scan
+            // Create an instance of the Intent Integrator class we imported.
+            IntentIntegrator scanIntegrator = new IntentIntegrator(this);
+
+            // Now we can call on the Intent Integrator method to start scanning.
+            scanIntegrator.initiateScan();
 
         }
 
