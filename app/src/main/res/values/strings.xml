@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">fintech-hackathon</string>
+
+    <string name="nothing_scanned">Nothing to read.</string>
 </resources>
