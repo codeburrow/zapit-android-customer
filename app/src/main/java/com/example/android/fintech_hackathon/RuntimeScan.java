@@ -2,7 +2,6 @@ package com.example.android.fintech_hackathon;
 
 import android.Manifest;
 import android.content.pm.PackageManager;
-import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
@@ -18,15 +17,14 @@ import com.google.android.gms.vision.Detector;
 import com.google.android.gms.vision.barcode.Barcode;
 import com.google.android.gms.vision.barcode.BarcodeDetector;
 
+import org.apache.http.NameValuePair;
+import org.apache.http.message.BasicNameValuePair;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 
 public class RuntimeScan extends AppCompatActivity {
 
@@ -146,100 +144,40 @@ public class RuntimeScan extends AppCompatActivity {
         // LOG_TAG
         private static final String LOG_TAG = "CheckPayment";
         // Response tags
+        private static final String GET_PAYMENT_STATUS_URL = "https://zapit-web.herokuapp.com/api/v1/products/payment/status";
         private static final String TAG_STATUS_CODE = "status_code";
+        private static final String TAG_ERROR = "error_code";
         private static final String TAG_DATA = "data";
         private static final String TAG_PAYED = "payed";
         private static final String TAG_MESSAGE = "message";
 
         @Override
-        protected String doInBackground(String... params){
+        protected String doInBackground(String... args){
             // Status_code
             int status_code;
+            // Error
+            String error;
             // JSON Parser
             JSONParser jsonParser = new JSONParser();
 
-            // These two need to be declared outside the try/catch
-            // so that they can be closed in the finally block.
-            HttpURLConnection urlConnection = null;
-            BufferedReader reader = null;
-
-            // Will contain the raw JSON response as a string.
-            String responseJsonStr = null;
-
             try {
-                // Construct the URL for the ZapIt query
-                // Possible parameters are avaiable at ZapIt API page, at
-                // http://zapit-web.herokuapp.com/apidoc/
-                final String CHECK_PAYMENT_URL =
-                        "https://zapit-web.herokuapp.com/api/v1/products/payment/status?";
-                final String PRODUCT_PARAM = "product-slug";
+                // Building Parameters
+                List<NameValuePair> params = new ArrayList<NameValuePair>();
+                params.add(new BasicNameValuePair("product-slug", args[0]));
 
-                Uri builtUri = Uri.parse(CHECK_PAYMENT_URL).buildUpon()
-                        .appendQueryParameter(PRODUCT_PARAM, params[0])
-                        .build();
+                // Make Http GET Request
+                JSONObject json = jsonParser.makeHttpRequest(
+                        GET_PAYMENT_STATUS_URL, "GET", params);
 
-                URL url = new URL(builtUri.toString());
-
-                Log.e(LOG_TAG, "Built URI " + builtUri.toString());
-
-                // Create the request to OpenWeatherMap, and open the connection
-                urlConnection = (HttpURLConnection) url.openConnection();
-                urlConnection.setRequestMethod("GET");
-                urlConnection.connect();
-
-                // Read the input stream into a String
-                InputStream inputStream = urlConnection.getInputStream();
-                StringBuffer buffer = new StringBuffer();
-                if (inputStream == null) {
-                    // Nothing to do.
-                    return null;
-                }
-                reader = new BufferedReader(new InputStreamReader(inputStream));
-
-                String line;
-                while ((line = reader.readLine()) != null) {
-                    // Since it's JSON, adding a newline isn't necessary (it won't affect parsing)
-                    // But it does make debugging a *lot* easier if you print out the completed
-                    // buffer for debugging.
-                    buffer.append(line + "\n");
-                }
-
-                if (buffer.length() == 0) {
-                    // Stream was empty.  No point in parsing.
-                    return null;
-                }
-
-                responseJsonStr = buffer.toString();
-                Log.e(LOG_TAG, "Response String: " + responseJsonStr);
-            } catch (IOException e) {
-                Log.e(LOG_TAG, "Error ", e);
-                // If the code didn't successfully get the product data,
-                // there's no point in attempting to parse it.
-                return null;
-            } finally {
-                if (urlConnection != null) {
-                    urlConnection.disconnect();
-                }
-                if (reader != null) {
-                    try {
-                        reader.close();
-                    } catch (final IOException e) {
-                        Log.e(LOG_TAG, "Error closing stream", e);
-                    }
-                }
-            }
-
-            try {
-                JSONObject json = new JSONObject(responseJsonStr);
-
-                // Get the status_code
+                // json status_code success element
                 status_code = json.getInt(TAG_STATUS_CODE);
 
                 if (status_code == 200){
                     return json.getJSONObject(TAG_DATA).getString(TAG_PAYED);
                 }
+
+
             } catch (JSONException e) {
-                Log.e(LOG_TAG, e.getMessage(), e);
                 e.printStackTrace();
             }
 
