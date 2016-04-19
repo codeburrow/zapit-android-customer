@@ -25,6 +25,8 @@ public class PaymentActivity extends AppCompatActivity {
 
     // LOG_TAG
     private static final String TAG = "Payment Activity";
+    // Test TextView
+    private TextView testText;
     // Payment Button
     private Button paymentButton;
     // Scanned IoT - product-slug
@@ -50,7 +52,7 @@ public class PaymentActivity extends AppCompatActivity {
         // Disable the paymentButton until the checkPayment
         paymentButton.setEnabled(payable);
 
-        TextView testText = (TextView) findViewById(R.id.test_text);
+        testText = (TextView) findViewById(R.id.test_text);
 
         if (scanned_IoT != null){
             testText.setText(scanned_IoT);
@@ -72,10 +74,15 @@ public class PaymentActivity extends AppCompatActivity {
     }
 
 
+    /**
+     *  Check product's payment_status
+     */
     private class CheckPaymentAsyncTask extends AsyncTask<String, Void, Boolean> {
 
         // LOG_TAG
         private static final String LOG_TAG = "CheckPayment";
+        // Error
+        String error;
 
         @Override
         protected Boolean doInBackground(String... args){
@@ -83,8 +90,7 @@ public class PaymentActivity extends AppCompatActivity {
             JSONParser jsonParser = new JSONParser();
             // Status_code
             int status_code;
-            // Error
-            String error;
+
 
             try {
                 // Building Parameters
@@ -152,8 +158,7 @@ public class PaymentActivity extends AppCompatActivity {
                         Iterator iterator = set.iterator();
                         while(iterator.hasNext()) {
                             Map.Entry mEntry = (Map.Entry)iterator.next();
-                            Log.e("TEST",
-                                    "key is: "+ mEntry.getKey() + " & Value is: " + mEntry.getValue());
+                            Log.e("dataMap", mEntry.getKey() + " : " + mEntry.getValue());
                         }
 
                         // payed
@@ -177,6 +182,12 @@ public class PaymentActivity extends AppCompatActivity {
                 Log.e(LOG_TAG, "Payed");
 
                 // Someone has already bought this product
+                if (error == null){
+                    setInfoText();
+                } else {
+                    String errorMessage = testText.getText() + "\n" + error;
+                    testText.setText(errorMessage);
+                }
             } else {
                 Log.e(LOG_TAG, "Un-payed");
 
@@ -184,14 +195,31 @@ public class PaymentActivity extends AppCompatActivity {
                 payable = true;
                 // Enable the paymentButton
                 paymentButton.setEnabled(payable);
+
+                setInfoText();
             }
+        }
 
-
+        private void setInfoText(){
+            // This is the String to be set in testText
+            String info = "";
+            // Iterate through dataMap and prepare the info String
+            Set set = dataMap.entrySet();
+            Iterator iterator = set.iterator();
+            while(iterator.hasNext()) {
+                Map.Entry mEntry = (Map.Entry)iterator.next();
+                info += mEntry.getKey() + ": " + mEntry.getValue() + "\n";
+            }
+            // TestText
+            testText.setText(info);
         }
 
     }
 
 
+    /**
+     *  Make a payment
+     */
     private class MakePaymentAsyncTask extends AsyncTask<String, Void, Boolean> {
 
         // LOG_TAG
