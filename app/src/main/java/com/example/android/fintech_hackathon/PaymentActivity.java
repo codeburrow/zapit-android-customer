@@ -86,7 +86,6 @@ public class PaymentActivity extends AppCompatActivity {
 
         @Override
         protected Boolean doInBackground(String... args){
-<<<<<<< HEAD
             // JSON Parser
             JSONParser jsonParser = new JSONParser();
             // Status_code
