@@ -65,13 +65,13 @@ public class PaymentActivity extends AppCompatActivity {
     }
 
 
-    private class CheckPaymentAsyncTask extends AsyncTask<String, Void, String> {
+    private class CheckPaymentAsyncTask extends AsyncTask<String, Void, Boolean> {
 
         // LOG_TAG
         private static final String LOG_TAG = "CheckPayment";
 
         @Override
-        protected String doInBackground(String... args){
+        protected Boolean doInBackground(String... args){
             // Status_code
             int status_code;
             // Error
@@ -93,7 +93,7 @@ public class PaymentActivity extends AppCompatActivity {
 
                 if (status_code == 200){
                     return json.getJSONObject(Constants.TAG_DATA)
-                            .getString(Constants.TAG_PAYED);
+                            .getBoolean(Constants.TAG_PAYED);
                 }
 
 
@@ -101,43 +101,38 @@ public class PaymentActivity extends AppCompatActivity {
                 e.printStackTrace();
             }
 
-            return null;
+            return true;
         }
 
+
         @Override
-        protected void onPostExecute(String payedStatus) {
-            if (payedStatus != null){
-                Log.e(LOG_TAG, payedStatus);
+        protected void onPostExecute(Boolean payedStatus) {
+            if (payedStatus){
+                Log.e(LOG_TAG, "Payed");
 
-                if (payedStatus.equals("0")){
-                    Log.e(LOG_TAG, "Unpayed");
-
-                    // This product can be bought
-                    payable = true;
-                    // Enable the paymentButton
-                    paymentButton.setEnabled(payable);
-
-                } else {
-                    Log.e(LOG_TAG, "Payed");
-
-                    // Someone has already bought this product
-                }
+                // Someone has already bought this product
             } else {
-                // Something went wrong - there is no payment status
+                Log.e(LOG_TAG, "Unpayed");
+
+                // This product can be bought
+                payable = true;
+                // Enable the paymentButton
+                paymentButton.setEnabled(payable);
             }
+
 
         }
 
     }
 
 
-    private class MakePaymentAsyncTask extends AsyncTask<String, Void, String> {
+    private class MakePaymentAsyncTask extends AsyncTask<String, Void, Boolean> {
 
         // LOG_TAG
         private static final String LOG_TAG = "MakePayment";
 
         @Override
-        protected String doInBackground(String... args){
+        protected Boolean doInBackground(String... args){
             // Status_code
             int status_code;
             // Error
@@ -159,7 +154,7 @@ public class PaymentActivity extends AppCompatActivity {
 
                 if (status_code == 200){
                     return json.getJSONObject(Constants.TAG_DATA)
-                            .getString(Constants.TAG_PAYED);
+                            .getBoolean(Constants.TAG_PAYED);
                 }
 
 
@@ -167,23 +162,20 @@ public class PaymentActivity extends AppCompatActivity {
                 e.printStackTrace();
             }
 
-            return null;
+            return false;
         }
 
         @Override
-        protected void onPostExecute(String payedStatus) {
-            if (payedStatus != null){
-                Log.e(LOG_TAG, payedStatus);
+        protected void onPostExecute(Boolean payedStatus) {
+            if (payedStatus){
+                Log.e(LOG_TAG, "PAYED");
 
-                if (payedStatus.equals("1")){
-                    Log.e(LOG_TAG, "PAYED");
-
-                    // This product cannot be bought again
-                    payable = false;
-                    // Disable the paymentButton
-                    paymentButton.setEnabled(payable);
-                }
+                // This product cannot be bought again
+                payable = false;
+                // Disable the paymentButton
+                paymentButton.setEnabled(payable);
             }
+
         }
 
     }
