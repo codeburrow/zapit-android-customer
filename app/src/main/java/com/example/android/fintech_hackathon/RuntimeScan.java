@@ -1,8 +1,8 @@
 package com.example.android.fintech_hackathon;
 
 import android.Manifest;
+import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -12,20 +12,14 @@ import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.android.gms.vision.CameraSource;
 import com.google.android.gms.vision.Detector;
 import com.google.android.gms.vision.barcode.Barcode;
 import com.google.android.gms.vision.barcode.BarcodeDetector;
 
-import org.apache.http.NameValuePair;
-import org.apache.http.message.BasicNameValuePair;
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 
 public class RuntimeScan extends AppCompatActivity {
 
@@ -136,8 +130,6 @@ public class RuntimeScan extends AppCompatActivity {
                             // Update the TextView
                             barcodeInfo.setText(scanned_IoT);
 
-                            CheckPaymentAsyncTask checkPayment = new CheckPaymentAsyncTask();
-                            checkPayment.execute(scanned_IoT);
                         }
                     });
                 }
@@ -147,128 +139,23 @@ public class RuntimeScan extends AppCompatActivity {
 
     }
 
-    public void pay(View view) {
-        MakePaymentAsyncTask makePayment = new MakePaymentAsyncTask();
-        makePayment.execute(scanned_IoT);
-    }
 
 
-    private class CheckPaymentAsyncTask extends AsyncTask<String, Void, String> {
-
-        // LOG_TAG
-        private static final String LOG_TAG = "CheckPayment";
-        // Response tags
-        private static final String GET_PAYMENT_STATUS_URL = "https://zapit-web.herokuapp.com/api/v1/products/payment/status";
-        private static final String TAG_STATUS_CODE = "status_code";
-        private static final String TAG_ERROR = "error_code";
-        private static final String TAG_DATA = "data";
-        private static final String TAG_PAYED = "payed";
-        private static final String TAG_MESSAGE = "message";
-
-        @Override
-        protected String doInBackground(String... args){
-            // Status_code
-            int status_code;
-            // Error
-            String error;
-            // JSON Parser
-            JSONParser jsonParser = new JSONParser();
-
-            try {
-                // Building Parameters
-                List<NameValuePair> params = new ArrayList<NameValuePair>();
-                params.add(new BasicNameValuePair("product-slug", args[0]));
-
-                // Make Http GET Request
-                JSONObject json = jsonParser.makeHttpRequest(
-                        GET_PAYMENT_STATUS_URL, "GET", params);
-
-                // json status_code success element
-                status_code = json.getInt(TAG_STATUS_CODE);
-
-                if (status_code == 200){
-                    return json.getJSONObject(TAG_DATA).getString(TAG_PAYED);
-                }
-
-
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-
-            return null;
-        }
-
-        @Override
-        protected void onPostExecute(String payedStatus) {
-            if (payedStatus != null){
-                Log.e(LOG_TAG, payedStatus);
-
-                if (payedStatus.equals("0")){
-                    Log.e(LOG_TAG, "Unpayed");
-                }
-            }
+    public void showDetails(View view) {
+        if (scanned_IoT != null){
+            Intent paymentActivityIntent = new Intent(this, PaymentActivity.class);
+            paymentActivityIntent.putExtra("product-slug", scanned_IoT);
+            startActivity(paymentActivityIntent);
+        } else {
+            Toast.makeText(
+                    RuntimeScan.this,
+                    R.string.nothing_scanned,
+                    Toast.LENGTH_SHORT)
+                    .show();
         }
 
     }
 
-
-    private class MakePaymentAsyncTask extends AsyncTask<String, Void, String> {
-
-        // LOG_TAG
-        private static final String LOG_TAG = "MakePayment";
-        // Response tags
-        private static final String MAKE_PAYMENT_URL = "https://zapit-web.herokuapp.com/api/v1/products/payment/request";
-        private static final String TAG_STATUS_CODE = "status_code";
-        private static final String TAG_ERROR = "error_code";
-        private static final String TAG_DATA = "data";
-        private static final String TAG_PAYED = "payed";
-        private static final String TAG_MESSAGE = "message";
-
-        @Override
-        protected String doInBackground(String... args){
-            // Status_code
-            int status_code;
-            // Error
-            String error;
-            // JSON Parser
-            JSONParser jsonParser = new JSONParser();
-
-            try {
-                // Building Parameters
-                List<NameValuePair> params = new ArrayList<NameValuePair>();
-                params.add(new BasicNameValuePair("product-slug", args[0]));
-
-                // Make Http GET Request
-                JSONObject json = jsonParser.makeHttpRequest(
-                        MAKE_PAYMENT_URL, "GET", params);
-
-                // json status_code success element
-                status_code = json.getInt(TAG_STATUS_CODE);
-
-                if (status_code == 200){
-                    return json.getJSONObject(TAG_DATA).getString(TAG_PAYED);
-                }
-
-
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-
-            return null;
-        }
-
-        @Override
-        protected void onPostExecute(String payedStatus) {
-            if (payedStatus != null){
-                Log.e(LOG_TAG, payedStatus);
-
-                if (payedStatus.equals("1")){
-                    Log.e(LOG_TAG, "PAYED");
-                }
-            }
-        }
-
-    }
 
 
 }

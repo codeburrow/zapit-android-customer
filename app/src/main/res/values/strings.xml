@@ -3,6 +3,10 @@
 
     <string name="nothing_scanned">Nothing to read.</string>
 
-    <string name="make_payment">PAY</string>
+    <string name="show_details">DETAILS</string>
+
+    <string name="make_payment">BUY IT!</string>
+
+    <string name="no_thanks">No, Thanks</string>
 
 </resources>
