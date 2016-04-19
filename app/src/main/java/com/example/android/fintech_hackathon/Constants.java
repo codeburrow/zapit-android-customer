@@ -5,6 +5,8 @@ package com.example.android.fintech_hackathon;
  */
 public class Constants {
 
+
+
     /**
      *  API Requests
      */
@@ -12,6 +14,11 @@ public class Constants {
             "https://zapit-web.herokuapp.com/api/v1/products/payment/status";
     static final String MAKE_PAYMENT_URL =
             "https://zapit-web.herokuapp.com/api/v1/products/payment/request";
+
+    /**
+    *  API Requests Parameters
+    */
+    static final String TAG_PRODUCT_SLUG = "product-slug";
 
 
     /**

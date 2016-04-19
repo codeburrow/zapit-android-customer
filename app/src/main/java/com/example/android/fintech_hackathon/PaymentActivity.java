@@ -86,16 +86,16 @@ public class PaymentActivity extends AppCompatActivity {
 
         @Override
         protected Boolean doInBackground(String... args){
+<<<<<<< HEAD
             // JSON Parser
             JSONParser jsonParser = new JSONParser();
             // Status_code
             int status_code;
 
-
             try {
                 // Building Parameters
                 List<NameValuePair> params = new ArrayList<NameValuePair>();
-                params.add(new BasicNameValuePair("product-slug", args[0]));
+                params.add(new BasicNameValuePair(Constants.TAG_PRODUCT_SLUG, args[0]));
 
                 // Make Http GET Request
                 JSONObject json = jsonParser.makeHttpRequest(
