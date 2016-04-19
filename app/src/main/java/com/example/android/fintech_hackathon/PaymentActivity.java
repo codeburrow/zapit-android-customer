@@ -15,6 +15,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 public class PaymentActivity extends AppCompatActivity {
@@ -72,17 +73,20 @@ public class PaymentActivity extends AppCompatActivity {
 
         @Override
         protected Boolean doInBackground(String... args){
+            // JSON Parser
+            JSONParser jsonParser = new JSONParser();
             // Status_code
             int status_code;
             // Error
             String error;
-            // JSON Parser
-            JSONParser jsonParser = new JSONParser();
+            // HashMap to store the information about the IoT
+            HashMap<String, String> data = new HashMap<>();
+
 
             try {
                 // Building Parameters
                 List<NameValuePair> params = new ArrayList<NameValuePair>();
-                params.add(new BasicNameValuePair("product-slug", args[0]));
+                params.add(new BasicNameValuePair(Constants.TAG_PRODUCT_SLUG, args[0]));
 
                 // Make Http GET Request
                 JSONObject json = jsonParser.makeHttpRequest(
