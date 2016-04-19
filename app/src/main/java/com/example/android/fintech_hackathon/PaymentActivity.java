@@ -69,13 +69,6 @@ public class PaymentActivity extends AppCompatActivity {
 
         // LOG_TAG
         private static final String LOG_TAG = "CheckPayment";
-        // Response tags
-        private static final String GET_PAYMENT_STATUS_URL = "https://zapit-web.herokuapp.com/api/v1/products/payment/status";
-        private static final String TAG_STATUS_CODE = "status_code";
-        private static final String TAG_ERROR = "error_code";
-        private static final String TAG_DATA = "data";
-        private static final String TAG_PAYED = "payed";
-        private static final String TAG_MESSAGE = "message";
 
         @Override
         protected String doInBackground(String... args){
@@ -93,13 +86,14 @@ public class PaymentActivity extends AppCompatActivity {
 
                 // Make Http GET Request
                 JSONObject json = jsonParser.makeHttpRequest(
-                        GET_PAYMENT_STATUS_URL, "GET", params);
+                        Constants.GET_PAYMENT_STATUS_URL, "GET", params);
 
                 // json status_code success element
-                status_code = json.getInt(TAG_STATUS_CODE);
+                status_code = json.getInt(Constants.TAG_STATUS_CODE);
 
                 if (status_code == 200){
-                    return json.getJSONObject(TAG_DATA).getString(TAG_PAYED);
+                    return json.getJSONObject(Constants.TAG_DATA)
+                            .getString(Constants.TAG_PAYED);
                 }
 
 
@@ -141,13 +135,6 @@ public class PaymentActivity extends AppCompatActivity {
 
         // LOG_TAG
         private static final String LOG_TAG = "MakePayment";
-        // Response tags
-        private static final String MAKE_PAYMENT_URL = "https://zapit-web.herokuapp.com/api/v1/products/payment/request";
-        private static final String TAG_STATUS_CODE = "status_code";
-        private static final String TAG_ERROR = "error_code";
-        private static final String TAG_DATA = "data";
-        private static final String TAG_PAYED = "payed";
-        private static final String TAG_MESSAGE = "message";
 
         @Override
         protected String doInBackground(String... args){
@@ -165,13 +152,14 @@ public class PaymentActivity extends AppCompatActivity {
 
                 // Make Http GET Request
                 JSONObject json = jsonParser.makeHttpRequest(
-                        MAKE_PAYMENT_URL, "GET", params);
+                        Constants.MAKE_PAYMENT_URL, "GET", params);
 
                 // json status_code success element
-                status_code = json.getInt(TAG_STATUS_CODE);
+                status_code = json.getInt(Constants.TAG_STATUS_CODE);
 
                 if (status_code == 200){
-                    return json.getJSONObject(TAG_DATA).getString(TAG_PAYED);
+                    return json.getJSONObject(Constants.TAG_DATA)
+                            .getString(Constants.TAG_PAYED);
                 }
 
 
