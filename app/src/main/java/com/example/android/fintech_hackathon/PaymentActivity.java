@@ -88,17 +88,51 @@ public class PaymentActivity extends AppCompatActivity {
                 JSONObject json = jsonParser.makeHttpRequest(
                         Constants.GET_PAYMENT_STATUS_URL, "GET", params);
 
-                // json status_code success element
-                status_code = json.getInt(Constants.TAG_STATUS_CODE);
+                /*
+                    Try to get the error message .
+                 */
+                try {
+                    // error - try to get the error
+                    error = json
+                            .getJSONObject(Constants.TAG_ERROR)
+                            .getString(Constants.TAG_MESSAGE);
 
-                if (status_code == 200){
-                    return json.getJSONObject(Constants.TAG_DATA)
-                            .getBoolean(Constants.TAG_PAYED);
+                    Log.e(LOG_TAG, error);
+                } catch (JSONException je){
+                    Log.e(LOG_TAG, "error catch: " + je.getMessage());
+
+                    // error doesn't exist
+                    error = null;
                 }
 
 
-            } catch (JSONException e) {
-                e.printStackTrace();
+                /*
+                    Get the status_code .
+                 */
+                try {
+                    // status_code - success
+                    status_code = json.getInt(Constants.TAG_STATUS_CODE);
+                } catch (JSONException je){
+                    // status_code - exists inside the error tag
+                    status_code = json.getJSONObject(Constants.TAG_ERROR)
+                            .getInt(Constants.TAG_STATUS_CODE);
+                }
+
+
+
+                if (error != null){
+                    // What will happen when there is an error
+
+                } else {
+                    if (status_code == 200){
+                        return json.getJSONObject(Constants.TAG_DATA)
+                                .getBoolean(Constants.TAG_PAYED);
+                    }
+
+                }
+
+            } catch (JSONException je) {
+                Log.e(LOG_TAG, "catch: " + je.getMessage());
             }
 
             return true;
@@ -112,7 +146,7 @@ public class PaymentActivity extends AppCompatActivity {
 
                 // Someone has already bought this product
             } else {
-                Log.e(LOG_TAG, "Unpayed");
+                Log.e(LOG_TAG, "Un-payed");
 
                 // This product can be bought
                 payable = true;
@@ -149,17 +183,51 @@ public class PaymentActivity extends AppCompatActivity {
                 JSONObject json = jsonParser.makeHttpRequest(
                         Constants.MAKE_PAYMENT_URL, "GET", params);
 
-                // json status_code success element
-                status_code = json.getInt(Constants.TAG_STATUS_CODE);
 
-                if (status_code == 200){
-                    return json.getJSONObject(Constants.TAG_DATA)
-                            .getBoolean(Constants.TAG_PAYED);
+                /*
+                    Try to get the error message .
+                 */
+                try {
+                    // error - try to get the error
+                    error = json
+                            .getJSONObject(Constants.TAG_ERROR)
+                            .getString(Constants.TAG_MESSAGE);
+
+                    Log.e(LOG_TAG, error);
+                } catch (JSONException je){
+                    Log.e(LOG_TAG, "error catch: " + je.getMessage());
+
+                    // error doesn't exist
+                    error = null;
+                }
+
+
+                /*
+                    Get the status_code .
+                 */
+                try {
+                    // status_code - success
+                    status_code = json.getInt(Constants.TAG_STATUS_CODE);
+                } catch (JSONException je){
+                    // status_code - exists inside the error tag
+                    status_code = json.getJSONObject(Constants.TAG_ERROR)
+                            .getInt(Constants.TAG_STATUS_CODE);
+                }
+
+
+                if (error != null) {
+                    // What will happen when there is an error
+
+                } else {
+                    if (status_code == 200){
+                        return json.getJSONObject(Constants.TAG_DATA)
+                                .getBoolean(Constants.TAG_PAYED);
+                    }
                 }
 
 
             } catch (JSONException e) {
-                e.printStackTrace();
+                Log.e(LOG_TAG, e.getMessage());
             }
 
             return false;

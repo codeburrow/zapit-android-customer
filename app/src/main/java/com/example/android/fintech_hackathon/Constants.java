@@ -33,7 +33,7 @@ public class Constants {
     static final String TAG_PAYED = "payed";
 
     // error
-    static final String TAG_ERROR = "error_code";
+    static final String TAG_ERROR = "error";
     // message
     static final String TAG_MESSAGE = "message";
 
