@@ -2,4 +2,7 @@
     <string name="app_name">fintech-hackathon</string>
 
     <string name="nothing_scanned">Nothing to read.</string>
+
+    <string name="make_payment">PAY</string>
+
 </resources>

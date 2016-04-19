@@ -10,6 +10,7 @@ import android.util.Log;
 import android.util.SparseArray;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
+import android.view.View;
 import android.widget.TextView;
 
 import com.google.android.gms.vision.CameraSource;
@@ -36,6 +37,10 @@ public class RuntimeScan extends AppCompatActivity {
     TextView barcodeInfo;
     // CameraSource
     CameraSource cameraSource;
+
+    // Scanned IoT - product-slug
+    private String scanned_IoT;
+
     // Request code for runtime permissions
     final private int REQUEST_CODE_ASK_PERMISSIONS = 123;
 
@@ -126,8 +131,13 @@ public class RuntimeScan extends AppCompatActivity {
                     // Use the post method of the TextView
                     barcodeInfo.post(new Runnable() {
                         public void run() {
+                            // Update the scanned IoT
+                            scanned_IoT = barcodes.valueAt(0).rawValue;
+                            // Update the TextView
+                            barcodeInfo.setText(scanned_IoT);
+
                             CheckPaymentAsyncTask checkPayment = new CheckPaymentAsyncTask();
-                            checkPayment.execute(barcodes.valueAt(0).rawValue);
+                            checkPayment.execute(scanned_IoT);
                         }
                     });
                 }
@@ -137,6 +147,10 @@ public class RuntimeScan extends AppCompatActivity {
 
     }
 
+    public void pay(View view) {
+        MakePaymentAsyncTask makePayment = new MakePaymentAsyncTask();
+        makePayment.execute(scanned_IoT);
+    }
 
 
     private class CheckPaymentAsyncTask extends AsyncTask<String, Void, String> {
@@ -190,15 +204,71 @@ public class RuntimeScan extends AppCompatActivity {
                 Log.e(LOG_TAG, payedStatus);
 
                 if (payedStatus.equals("0")){
-                    // Update the TextView
-                    barcodeInfo.setText("Unpayed");
+                    Log.e(LOG_TAG, "Unpayed");
                 }
             }
         }
 
-
     }
 
+
+    private class MakePaymentAsyncTask extends AsyncTask<String, Void, String> {
+
+        // LOG_TAG
+        private static final String LOG_TAG = "MakePayment";
+        // Response tags
+        private static final String MAKE_PAYMENT_URL = "https://zapit-web.herokuapp.com/api/v1/products/payment/request";
+        private static final String TAG_STATUS_CODE = "status_code";
+        private static final String TAG_ERROR = "error_code";
+        private static final String TAG_DATA = "data";
+        private static final String TAG_PAYED = "payed";
+        private static final String TAG_MESSAGE = "message";
+
+        @Override
+        protected String doInBackground(String... args){
+            // Status_code
+            int status_code;
+            // Error
+            String error;
+            // JSON Parser
+            JSONParser jsonParser = new JSONParser();
+
+            try {
+                // Building Parameters
+                List<NameValuePair> params = new ArrayList<NameValuePair>();
+                params.add(new BasicNameValuePair("product-slug", args[0]));
+
+                // Make Http GET Request
+                JSONObject json = jsonParser.makeHttpRequest(
+                        MAKE_PAYMENT_URL, "GET", params);
+
+                // json status_code success element
+                status_code = json.getInt(TAG_STATUS_CODE);
+
+                if (status_code == 200){
+                    return json.getJSONObject(TAG_DATA).getString(TAG_PAYED);
+                }
+
+
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(String payedStatus) {
+            if (payedStatus != null){
+                Log.e(LOG_TAG, payedStatus);
+
+                if (payedStatus.equals("1")){
+                    Log.e(LOG_TAG, "PAYED");
+                }
+            }
+        }
+
+    }
 
 
 }
