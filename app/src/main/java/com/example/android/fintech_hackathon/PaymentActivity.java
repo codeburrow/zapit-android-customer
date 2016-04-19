@@ -15,7 +15,11 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 public class PaymentActivity extends AppCompatActivity {
 
@@ -25,6 +29,9 @@ public class PaymentActivity extends AppCompatActivity {
     private Button paymentButton;
     // Scanned IoT - product-slug
     private String scanned_IoT;
+
+    // HashMap to store the data of the IoT
+    HashMap<String, String> dataMap = new HashMap<>();
     // Flag to know if the product is available
     private boolean payable = false;
 
@@ -72,12 +79,12 @@ public class PaymentActivity extends AppCompatActivity {
 
         @Override
         protected Boolean doInBackground(String... args){
+            // JSON Parser
+            JSONParser jsonParser = new JSONParser();
             // Status_code
             int status_code;
             // Error
             String error;
-            // JSON Parser
-            JSONParser jsonParser = new JSONParser();
 
             try {
                 // Building Parameters
@@ -125,6 +132,31 @@ public class PaymentActivity extends AppCompatActivity {
 
                 } else {
                     if (status_code == 200){
+                        /*
+                         *   Fill the dataMap
+                         */
+                        String[] dataTagsList = {Constants.TAG_SLUG,
+                                Constants.TAG_NAME,
+                                Constants.TAG_PRICE,
+                                Constants.TAG_DESCRIPTION};
+
+                        for (String dataAttribute : dataTagsList) {
+                            dataMap.put(dataAttribute, json.getJSONObject(Constants.TAG_DATA)
+                                    .getString(dataAttribute));
+                        }
+
+                        /*
+                         *  Display content of dataMap using Iterator
+                         */
+                        Set set = dataMap.entrySet();
+                        Iterator iterator = set.iterator();
+                        while(iterator.hasNext()) {
+                            Map.Entry mEntry = (Map.Entry)iterator.next();
+                            Log.e("TEST",
+                                    "key is: "+ mEntry.getKey() + " & Value is: " + mEntry.getValue());
+                        }
+
+                        // payed
                         return json.getJSONObject(Constants.TAG_DATA)
                                 .getBoolean(Constants.TAG_PAYED);
                     }
